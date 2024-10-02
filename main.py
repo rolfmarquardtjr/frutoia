@@ -16,8 +16,17 @@ from utils.pdf_generator import export_to_pdf
 from ui.styles import load_css
 from api.openai_api import generate_questions_with_openai
 
+st.set_page_config(layout="wide", page_title="fruto.ia", page_icon="💼")
+
+st.markdown("""
+    <style>
+    input[type="text"], input[type="number"], textarea {
+        background-color: white !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 def main():
-    st.set_page_config(layout="wide", page_title="Consultor de Negócios IA", page_icon="💼")
     load_css()
     initialize_session_state()
 
@@ -28,10 +37,10 @@ def main():
         with tab2:
             register()
     else:
-        st.sidebar.title(f"Bem-vindo, {st.session_state['user']}!")
-        if st.sidebar.button("Logout"):
-            st.session_state.clear()
-            st.rerun()
+        # Adicionando o logo no topo do menu lateral
+        st.sidebar.image("logo.png", use_column_width=True)
+        
+        st.sidebar.title(f"Bora lá, {st.session_state['user']}!")
         
         st.sidebar.title("Navegação")
         page = st.sidebar.radio("Ir para", ["Início", "Dashboard", "Análise SWOT", "Projeções Financeiras", "Assistente IA", "Controle de Gastos", "Kanban", "Metas", "Rede de Networking", "Conquistas", "Pesquisa de Mercado", "Consultor Jurídico"])
@@ -66,10 +75,19 @@ def main():
 
         if st.sidebar.button("Exportar Relatório"):
             export_to_pdf()
+        
+        # Movendo o botão de logout para a parte inferior do menu
+        st.sidebar.markdown("---")  # Adiciona uma linha separadora
+        if st.sidebar.button("Logout"):
+            st.session_state.clear()
+            st.rerun()
 
 def display_home():
-    st.title("Bem-vindo ao Consultor de Negócios IA")
-    st.write("Descreva sua ideia de negócio e nós ajudaremos você a desenvolver um plano!")
+    col1, col2, col3 = st.columns([1,2,1])
+    
+    with col2:
+        st.title("Bem-vindo ao Fruto.ia")
+        st.write("Descreva sua ideia de negócio e nós ajudaremos você a desenvolver um plano!")
 
     # Barra de progresso
     st.header("Seu Progresso")

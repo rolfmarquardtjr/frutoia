@@ -9,21 +9,79 @@ import re
 def display_swot_analysis():
     st.title("Análise SWOT")
     
-    categories = ['forças', 'fraquezas', 'oportunidades', 'ameaças']
-    for category in categories:
-        st.header(category.capitalize())
-        new_item = st.text_input(f"Adicionar {category}", key=f"add_{category}")
-        if st.button(f"Adicionar {category}", key=f"add_button_{category}"):
-            if new_item:
-                st.session_state['swot'][category].append(new_item)
-                save_session_data(st.session_state['user'])
-                st.success(f"{category.capitalize()} adicionada com sucesso!")
-        if st.session_state['swot'][category]:
-            st.write(f"**{category.capitalize()}:**")
-            for item in st.session_state['swot'][category]:
-                st.write(f"- {item}")
-        else:
-            st.write(f"Sem {category} adicionadas ainda.")
+    # Container da análise SWOT
+    st.markdown("<div class='swot-container'>", unsafe_allow_html=True)
+
+    # Forças
+    st.markdown("<div class='swot-item forcas'>", unsafe_allow_html=True)
+    st.markdown("<div class='swot-icon'><img src='https://cdn-icons-png.flaticon.com/512/190/190411.png' width='50'/></div>", unsafe_allow_html=True)
+    st.header("Forças")
+    add_strength = st.text_input("Adicionar forças", key="add_strength")
+    if st.button("Adicionar forças", key="add_strength_button"):
+        if add_strength:
+            st.session_state['swot']['forças'].append(add_strength)
+            save_session_data(st.session_state['user'])
+            st.success("Força adicionada com sucesso!")
+    st.markdown("**Forças:**")
+    st.markdown("<ul>", unsafe_allow_html=True)
+    for strength in st.session_state['swot']['forças']:
+        st.markdown(f"<li>{strength}</li>", unsafe_allow_html=True)
+    st.markdown("</ul>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Fraquezas
+    st.markdown("<div class='swot-item fraquezas'>", unsafe_allow_html=True)
+    st.markdown("<div class='swot-icon'><img src='https://cdn-icons-png.flaticon.com/512/190/190406.png' width='50'/></div>", unsafe_allow_html=True)
+    st.header("Fraquezas")
+    add_weakness = st.text_input("Adicionar fraquezas", key="add_weakness")
+    if st.button("Adicionar fraquezas", key="add_weakness_button"):
+        if add_weakness:
+            st.session_state['swot']['fraquezas'].append(add_weakness)
+            save_session_data(st.session_state['user'])
+            st.success("Fraqueza adicionada com sucesso!")
+    st.markdown("**Fraquezas:**")
+    st.markdown("<ul>", unsafe_allow_html=True)
+    for weakness in st.session_state['swot']['fraquezas']:
+        st.markdown(f"<li>{weakness}</li>", unsafe_allow_html=True)
+    st.markdown("</ul>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Oportunidades
+    st.markdown("<div class='swot-item oportunidades'>", unsafe_allow_html=True)
+    st.markdown("<div class='swot-icon'><img src='https://cdn-icons-png.flaticon.com/512/190/190407.png' width='50'/></div>", unsafe_allow_html=True)
+    st.header("Oportunidades")
+    add_opportunity = st.text_input("Adicionar oportunidades", key="add_opportunity")
+    if st.button("Adicionar oportunidades", key="add_opportunity_button"):
+        if add_opportunity:
+            st.session_state['swot']['oportunidades'].append(add_opportunity)
+            save_session_data(st.session_state['user'])
+            st.success("Oportunidade adicionada com sucesso!")
+    st.markdown("**Oportunidades:**")
+    st.markdown("<ul>", unsafe_allow_html=True)
+    for opportunity in st.session_state['swot']['oportunidades']:
+        st.markdown(f"<li>{opportunity}</li>", unsafe_allow_html=True)
+    st.markdown("</ul>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Ameaças
+    st.markdown("<div class='swot-item ameacas'>", unsafe_allow_html=True)
+    st.markdown("<div class='swot-icon'><img src='https://cdn-icons-png.flaticon.com/512/190/190408.png' width='50'/></div>", unsafe_allow_html=True)
+    st.header("Ameaças")
+    add_threat = st.text_input("Adicionar ameaças", key="add_threat")
+    if st.button("Adicionar ameaças", key="add_threat_button"):
+        if add_threat:
+            st.session_state['swot']['ameaças'].append(add_threat)
+            save_session_data(st.session_state['user'])
+            st.success("Ameaça adicionada com sucesso!")
+    st.markdown("**Ameaças:**")
+    st.markdown("<ul>", unsafe_allow_html=True)
+    for threat in st.session_state['swot']['ameaças']:
+        st.markdown(f"<li>{threat}</li>", unsafe_allow_html=True)
+    st.markdown("</ul>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
     check_and_award_achievement("Análise Estratégica", "Completou a análise SWOT.")
 
     if st.button("Gerar Gráfico SWOT"):
@@ -77,40 +135,6 @@ Forneça a resposta no seguinte formato JSON:
     
     try:
         response = get_assistant_response([{"role": "user", "content": prompt}])
-        swot_analysis = eval(response)  # Convert string to dictionary
-        return swot_analysis
-    except Exception as e:
-        st.error(f"Erro ao gerar análise SWOT: {e}")
-        return {
-            "forças": [],
-            "fraquezas": [],
-            "oportunidades": [],
-            "ameaças": []
-        }
-
-def update_swot_analysis(swot_data):
-    st.session_state['swot'] = swot_data
-    save_session_data(st.session_state['user'])
-    st.success("Análise SWOT atualizada com sucesso!")
-
-def generate_swot_analysis(idea):
-    prompt = f"""
-Com base na seguinte ideia de negócio, realize uma análise SWOT completa. Forneça 3 itens para cada categoria:
-
-Ideia de Negócio: {idea}
-
-Forneça a resposta no seguinte formato JSON:
-
-{{
-    "forças": ["força 1", "força 2", "força 3"],
-    "fraquezas": ["fraqueza 1", "fraqueza 2", "fraqueza 3"],
-    "oportunidades": ["oportunidade 1", "oportunidade 2", "oportunidade 3"],
-    "ameaças": ["ameaça 1", "ameaça 2", "ameaça 3"]
-}}
-"""
-    
-    try:
-        response = get_assistant_response([{"role": "user", "content": prompt}])
         
         # Tenta primeiro fazer o parse do JSON diretamente
         try:
@@ -140,3 +164,8 @@ Forneça a resposta no seguinte formato JSON:
             "oportunidades": [],
             "ameaças": []
         }
+
+def update_swot_analysis(swot_data):
+    st.session_state['swot'] = swot_data
+    save_session_data(st.session_state['user'])
+    st.success("Análise SWOT atualizada com sucesso!")

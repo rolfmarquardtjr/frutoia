@@ -14,6 +14,7 @@ from modules.legal_consultant import display_legal_consultant
 from modules.achievements import display_achievements, check_and_award_achievement, calculate_progress
 from utils.pdf_generator import export_to_pdf
 from ui.styles import load_css
+from ui.components import render_menu
 from api.openai_api import generate_questions_with_openai
 
 st.set_page_config(layout="wide", page_title="fruto.ia", page_icon="💼")
@@ -22,6 +23,13 @@ st.markdown("""
     <style>
     input[type="text"], input[type="number"], textarea {
         background-color: white !important;
+    }
+    .center-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -37,13 +45,16 @@ def main():
         with tab2:
             register()
     else:
-        # Adicionando o logo no topo do menu lateral
-        st.sidebar.image("logo.png", use_column_width=True)
-        
-        st.sidebar.title(f"Bora lá, {st.session_state['user']}!")
-        
-        st.sidebar.title("Navegação")
-        page = st.sidebar.radio("Ir para", ["Início", "Dashboard", "Análise SWOT", "Projeções Financeiras", "Assistente IA", "Controle de Gastos", "Kanban", "Metas", "Rede de Networking", "Conquistas", "Pesquisa de Mercado", "Consultor Jurídico"])
+        # Inicializando listas no session_state
+        if 'swot' not in st.session_state:
+            st.session_state['swot'] = {
+                'forças': [],
+                'fraquezas': [],
+                'oportunidades': [],
+                'ameaças': []
+            }
+
+        page = render_menu()
 
         if page == "Início":
             display_home()
@@ -69,27 +80,19 @@ def main():
             display_market_research()
         elif page == "Consultor Jurídico":
             display_legal_consultant()
-        
-        with st.sidebar.expander("Sobre o App"):
-            st.write("Este é um consultor de negócios alimentado por IA.")
-
-        if st.sidebar.button("Exportar Relatório"):
-            export_to_pdf()
-        
-        # Movendo o botão de logout para a parte inferior do menu
-        st.sidebar.markdown("---")  # Adiciona uma linha separadora
-        if st.sidebar.button("Logout"):
-            st.session_state.clear()
-            st.rerun()
 
 def display_home():
-    col1, col2, col3 = st.columns([1,2,1])
+    col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        st.title("Bem-vindo ao Fruto.ia")
-        st.write("Descreva sua ideia de negócio e nós ajudaremos você a desenvolver um plano!")
+        st.markdown("""
+            <div style='text-align: center;'>
+                <h1>Bem-vindo ao Fruto.IA</h1>
+                <p>Descreva sua ideia de negócio e nós ajudaremos você a desenvolver um plano!</p>
+            </div>
+        """, unsafe_allow_html=True)
 
-    # Barra de progresso
+    # Barra de progresso padrão
     st.header("Seu Progresso")
     progress = calculate_progress()
     st.session_state['progress'] = progress
@@ -105,7 +108,7 @@ def display_home():
         # Passo 1: Ideia de Negócio
         st.header("Passo 1: Descreva sua ideia de negócio")
         user_idea = st.text_area("Descreva sua ideia de negócio", value=st.session_state.get('user_idea', ''))
-        if st.button("Gerar Perguntas"):
+        if st.button("Gerar Perguntas", key="generate_questions"):
             if user_idea:
                 st.session_state['user_idea'] = user_idea
                 with st.spinner('Gerando perguntas...'):
@@ -132,7 +135,7 @@ def display_home():
         
         st.session_state['answers'] = answers
 
-        if st.button('Gerar Resultados'):
+        if st.button('Gerar Resultados', key="generate_results"):
             with st.spinner("Gerando resultados..."):
                 try:
                     # Gerar Dashboard
@@ -140,7 +143,7 @@ def display_home():
 
                     # Gerar Análise SWOT
                     swot = generate_swot_analysis(st.session_state['user_idea'])
-                    update_swot_analysis(swot)
+                    st.session_state['swot'] = swot
 
                     # Gerar Kanban
                     initialize_kanban(st.session_state['user_idea'], st.session_state['questions'], st.session_state['answers'])
@@ -158,12 +161,18 @@ def display_home():
                     st.error("Por favor, tente novamente. Se o problema persistir, entre em contato com o suporte.")
 
     if st.session_state['business_generated']:
-        if st.button('Gerar Novo Negócio'):
+        if st.button('Gerar Novo Negócio', key="generate_new_business"):
             st.session_state['business_generated'] = False
             st.session_state['questions_generated'] = False
             st.session_state['user_idea'] = ''
             st.session_state['questions'] = []
             st.session_state['answers'] = []
+            st.session_state['swot'] = {
+                'forças': [],
+                'fraquezas': [],
+                'oportunidades': [],
+                'ameaças': []
+            }
             st.success("Você pode começar um novo negócio agora!")
             st.rerun()
 

@@ -18,33 +18,40 @@ def display_dashboard():
     
     st.subheader("Métricas")
     metrics = data.get('metricas', [])
-    num_metrics = len(metrics)
-    cols = st.columns(num_metrics)
-    for i, metrica in enumerate(metrics):
-        with cols[i]:
-            st.metric(metrica['nome'], metrica['valor'])
+    cols = st.columns(len(metrics))
+    for col, metrica in zip(cols, metrics):
+        with col:
+            st.markdown(f"""
+                <div class='metric-item'>
+                    <img src='https://cdn-icons-png.flaticon.com/512/190/190411.png' class='icon'/>
+                    <h3>{metrica['nome']}</h3>
+                    <p>{metrica['valor']}</p>
+                </div>
+            """, unsafe_allow_html=True)
     
     st.subheader("Planos de Ação")
     etapas = data.get('etapas', [])
     for etapa_idx, etapa in enumerate(etapas):
-        with st.expander(f"{etapa['titulo']}"):
-            st.write(f"**Descrição:** {etapa.get('descricao', 'Não fornecida')}")
-            st.write("**Tarefas:**")
-            for tarefa_idx, tarefa in enumerate(etapa['tarefas']):
-                task_key = f"task_{etapa_idx}_{tarefa_idx}"
-                is_completed = st.session_state.get(task_key, False)
-                completed = st.checkbox(tarefa, value=is_completed, key=task_key)
-                if completed != is_completed:
-                    st.session_state[task_key] = completed
-                    save_session_data(st.session_state['user'])
-            
-            if st.button(f"Gerar Plano de Ação para: {etapa['titulo']}", key=f"gen_plan_{etapa_idx}"):
-                with st.spinner("Gerando plano de ação detalhado..."):
-                    detailed_plan = generate_detailed_action_plan(etapa['titulo'], etapa['tarefas'])
-                    st.session_state[f'detailed_plan_{etapa_idx}'] = detailed_plan
-            
-            if f'detailed_plan_{etapa_idx}' in st.session_state:
-                st.markdown(st.session_state[f'detailed_plan_{etapa_idx}'])
+        st.markdown("<div class='plan-item'>", unsafe_allow_html=True)
+        st.markdown(f"<h4>{etapa['titulo']}</h4>", unsafe_allow_html=True)
+        st.write(f"**Descrição:** {etapa.get('descricao', 'Não fornecida')}")
+        st.write("**Tarefas:**")
+        for tarefa_idx, tarefa in enumerate(etapa['tarefas']):
+            task_key = f"task_{etapa_idx}_{tarefa_idx}"
+            is_completed = st.session_state.get(task_key, False)
+            completed = st.checkbox(tarefa, value=is_completed, key=task_key)
+            if completed != is_completed:
+                st.session_state[task_key] = completed
+                save_session_data(st.session_state['user'])
+        
+        if st.button(f"Gerar Plano de Ação para: {etapa['titulo']}", key=f"gen_plan_{etapa_idx}"):
+            with st.spinner("Gerando plano de ação detalhado..."):
+                detailed_plan = generate_detailed_action_plan(etapa['titulo'], etapa['tarefas'])
+                st.session_state[f'detailed_plan_{etapa_idx}'] = detailed_plan
+        
+        if f'detailed_plan_{etapa_idx}' in st.session_state:
+            st.markdown(st.session_state[f'detailed_plan_{etapa_idx}'])
+        st.markdown("</div>", unsafe_allow_html=True)
     
     st.subheader("Dicas")
     for dica in data.get('dicas', []):

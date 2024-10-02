@@ -155,5 +155,51 @@ def load_css():
             width: 30px;
             height: 30px;
         }
+
+        /* Dashboard */
+        .dashboard-container {
+            margin-top: 20px;
+        }
+        .metric-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .metric-item {
+            background-color: #ffffff;
+            padding: 30px; /* Aumentar o padding */
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 250px; /* Aumentar a largura */
+            height: 200px; /* Definir altura fixa */
+            margin: 10px;
+        }
+        .metric-item h3 {
+            margin: 10px 0;
+            font-size: 18px; /* Diminuir o tamanho da fonte */
+        }
+        .metric-item p {
+            font-size: 16px; /* Diminuir o tamanho da fonte */
+        }
+        .plan-container {
+            margin-top: 20px;
+        }
+        .plan-item {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .plan-item h4 {
+            margin-bottom: 10px;
+        }
+        .icon {
+            width: 50px; /* Aumentar o tamanho do ícone */
+            height: 50px;
+            margin-bottom: 10px;
+        }
     </style>
     """, unsafe_allow_html=True)

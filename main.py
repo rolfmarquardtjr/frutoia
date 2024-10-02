@@ -108,7 +108,8 @@ def display_home():
         # Passo 1: Ideia de Negócio
         st.header("Passo 1: Descreva sua ideia de negócio")
         user_idea = st.text_area("Descreva sua ideia de negócio", value=st.session_state.get('user_idea', ''))
-        if st.button("Gerar Perguntas", key="generate_questions"):
+        generate_questions_clicked = st.button("Gerar Perguntas", key="generate_questions")
+        if generate_questions_clicked:
             if user_idea:
                 st.session_state['user_idea'] = user_idea
                 with st.spinner('Gerando perguntas...'):

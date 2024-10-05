@@ -16,6 +16,7 @@ from utils.pdf_generator import export_to_pdf
 from ui.styles import load_css
 from ui.components import render_menu
 from api.openai_api import generate_questions_with_openai
+from PIL import Image
 
 st.set_page_config(layout="wide", page_title="fruto.ia", page_icon="💼")
 
@@ -85,9 +86,14 @@ def display_home():
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
+        # Adicionando o logo
+        logo_path = "logo_deitado.png"
+        logo = Image.open(logo_path)
+        st.image(logo, use_column_width=True)
+
+        # Mantendo a descrição
         st.markdown("""
             <div style='text-align: center;'>
-                <h1>Bem-vindo ao Fruto.IA</h1>
                 <p>Descreva sua ideia de negócio e nós ajudaremos você a desenvolver um plano!</p>
             </div>
         """, unsafe_allow_html=True)
@@ -187,6 +193,6 @@ def generate_questions(idea):
     except Exception as e:
         st.error(f'Erro ao gerar perguntas: {e}')
         return []
-
+    
 if __name__ == '__main__':
     main()

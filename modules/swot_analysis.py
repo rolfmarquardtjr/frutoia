@@ -9,82 +9,96 @@ import re
 def display_swot_analysis():
     st.title("Análise SWOT")
     
-    # Container da análise SWOT
-    st.markdown("<div class='swot-container'>", unsafe_allow_html=True)
+    # CSS atualizado
+    st.markdown("""
+    <style>
+    .stButton > button {
+        background-color: #e8e8e8 !important;
+        color: #000000 !important;
+        border: none !important;
+        border-radius: 4px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 600 !important;
+        width: 100% !important;
+    }
+    .stButton > button:hover {
+        background-color: #73B6E6 !important;
+    }
+    .stButton > button:focus {
+        background-color: #89CFF0 !important;
+        box-shadow: none !important;
+    }
+    div[data-testid="stToolbar"] {
+        display: none;
+    }
+    .full-width-button {
+        width: 100%;
+        text-align: center;
+    }
+    .full-width-button button {
+        width: 100%;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    # Forças
-    st.markdown("<div class='swot-item forcas'>", unsafe_allow_html=True)
-    st.markdown("<div class='swot-icon'><img src='https://cdn-icons-png.flaticon.com/512/190/190411.png' width='50'/></div>", unsafe_allow_html=True)
-    st.header("Forças")
-    add_strength = st.text_input("Adicionar forças", key="add_strength")
-    if st.button("Adicionar forças", key="add_strength_button"):
-        if add_strength:
-            st.session_state['swot']['forças'].append(add_strength)
-            save_session_data(st.session_state['user'])
-            st.success("Força adicionada com sucesso!")
-    st.markdown("**Forças:**")
-    st.markdown("<ul>", unsafe_allow_html=True)
-    for strength in st.session_state['swot']['forças']:
-        st.markdown(f"<li>{strength}</li>", unsafe_allow_html=True)
-    st.markdown("</ul>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    # Exibir o quadro SWOT
+    columns = st.columns(4)
+    categories = ["Forças", "Fraquezas", "Oportunidades", "Ameaças"]
+    colors = ["#0066cc", "#0099cc", "#66cc99", "#ff9933"]
 
-    # Fraquezas
-    st.markdown("<div class='swot-item fraquezas'>", unsafe_allow_html=True)
-    st.markdown("<div class='swot-icon'><img src='https://cdn-icons-png.flaticon.com/512/190/190406.png' width='50'/></div>", unsafe_allow_html=True)
-    st.header("Fraquezas")
-    add_weakness = st.text_input("Adicionar fraquezas", key="add_weakness")
-    if st.button("Adicionar fraquezas", key="add_weakness_button"):
-        if add_weakness:
-            st.session_state['swot']['fraquezas'].append(add_weakness)
-            save_session_data(st.session_state['user'])
-            st.success("Fraqueza adicionada com sucesso!")
-    st.markdown("**Fraquezas:**")
-    st.markdown("<ul>", unsafe_allow_html=True)
-    for weakness in st.session_state['swot']['fraquezas']:
-        st.markdown(f"<li>{weakness}</li>", unsafe_allow_html=True)
-    st.markdown("</ul>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # Oportunidades
-    st.markdown("<div class='swot-item oportunidades'>", unsafe_allow_html=True)
-    st.markdown("<div class='swot-icon'><img src='https://cdn-icons-png.flaticon.com/512/190/190407.png' width='50'/></div>", unsafe_allow_html=True)
-    st.header("Oportunidades")
-    add_opportunity = st.text_input("Adicionar oportunidades", key="add_opportunity")
-    if st.button("Adicionar oportunidades", key="add_opportunity_button"):
-        if add_opportunity:
-            st.session_state['swot']['oportunidades'].append(add_opportunity)
-            save_session_data(st.session_state['user'])
-            st.success("Oportunidade adicionada com sucesso!")
-    st.markdown("**Oportunidades:**")
-    st.markdown("<ul>", unsafe_allow_html=True)
-    for opportunity in st.session_state['swot']['oportunidades']:
-        st.markdown(f"<li>{opportunity}</li>", unsafe_allow_html=True)
-    st.markdown("</ul>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # Ameaças
-    st.markdown("<div class='swot-item ameacas'>", unsafe_allow_html=True)
-    st.markdown("<div class='swot-icon'><img src='https://cdn-icons-png.flaticon.com/512/190/190408.png' width='50'/></div>", unsafe_allow_html=True)
-    st.header("Ameaças")
-    add_threat = st.text_input("Adicionar ameaças", key="add_threat")
-    if st.button("Adicionar ameaças", key="add_threat_button"):
-        if add_threat:
-            st.session_state['swot']['ameaças'].append(add_threat)
-            save_session_data(st.session_state['user'])
-            st.success("Ameaça adicionada com sucesso!")
-    st.markdown("**Ameaças:**")
-    st.markdown("<ul>", unsafe_allow_html=True)
-    for threat in st.session_state['swot']['ameaças']:
-        st.markdown(f"<li>{threat}</li>", unsafe_allow_html=True)
-    st.markdown("</ul>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
+    for col, category, color in zip(columns, categories, colors):
+        with col:
+            st.markdown(f"<h3 style='background-color: {color}; padding: 10px; border-radius: 5px; text-align: center; color: white;'>{category}</h3>", unsafe_allow_html=True)
+            
+            for i, item in enumerate(st.session_state['swot'][category.lower()]):
+                card_key = f"{category}_{i}"
+                
+                # Card clicável
+                if st.button(item, key=f"card_{card_key}", use_container_width=True):
+                    st.session_state[f'editing_{card_key}'] = True
+                
+                # Campos de edição e exclusão
+                if st.session_state.get(f'editing_{card_key}', False):
+                    with st.form(key=f"edit_form_{card_key}"):
+                        new_description = st.text_input("Nova descrição", value=item)
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            if st.form_submit_button("Salvar", use_container_width=True):
+                                st.session_state['swot'][category.lower()][i] = new_description
+                                save_session_data(st.session_state['user'])
+                                st.session_state[f'editing_{card_key}'] = False
+                                st.rerun()
+                        with col2:
+                            if st.form_submit_button("Excluir", use_container_width=True):
+                                st.session_state['swot'][category.lower()].pop(i)
+                                save_session_data(st.session_state['user'])
+                                st.session_state[f'editing_{card_key}'] = False
+                                st.rerun()
+                        with col3:
+                            if st.form_submit_button("Cancelar", use_container_width=True):
+                                st.session_state[f'editing_{card_key}'] = False
+                                st.rerun()
+            
+            # Botão para adicionar novo item
+            add_key = f"add_{category.lower()}"
+            if st.button(f"+ Adicionar {category.lower()}", key=add_key, use_container_width=True):
+                st.session_state[f'adding_{add_key}'] = True
+            
+            # Campo de entrada para novo item
+            if st.session_state.get(f'adding_{add_key}', False):
+                with st.form(key=f"add_form_{add_key}"):
+                    new_item = st.text_input(f"Novo item para {category.lower()}")
+                    if st.form_submit_button("Adicionar", use_container_width=True):
+                        if new_item:
+                            st.session_state['swot'][category.lower()].append(new_item)
+                            save_session_data(st.session_state['user'])
+                            st.success(f"{category[:-1]} adicionada com sucesso!")
+                            st.session_state[f'adding_{add_key}'] = False
+                            st.rerun()
 
     check_and_award_achievement("Análise Estratégica", "Completou a análise SWOT.")
 
-    if st.button("Gerar Gráfico SWOT"):
+    if st.button("Gerar Gráfico SWOT", use_container_width=True):
         generate_swot_chart()
     if st.session_state.get('swot_graph_data'):
         st.plotly_chart(st.session_state['swot_graph_data'])
